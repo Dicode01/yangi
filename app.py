@@ -1,100 +1,74 @@
 import streamlit as st
 import streamlit.components.v1 as components
 
-st.set_page_config(page_title="Iftorlik Taklifi", page_icon="🌙")
+st.set_page_config(page_title="Iftorlik Operatsiyasi", page_icon="🥘")
 
-# Sarlavha (Iftorlikka mos)
 st.markdown("<h1 style='text-align: center;'>Bugun restoranda iftorlik qiberasizmi? 🥘🌙</h1>", unsafe_allow_html=True)
 
 html_code = """
 <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js"></script>
 
-<div id="wrapper" style="height: 550px; width: 100%; position: relative; border: 3px solid #FFD700; border-radius: 20px; overflow: hidden; background-color: #0b1126; touch-action: none; font-family: 'Arial', sans-serif;">
+<div id="wrapper" style="height: 550px; width: 100%; position: relative; border: 4px solid #FFD700; border-radius: 25px; overflow: hidden; background-color: #0b1126; touch-action: none;">
     <div style="position: absolute; top: 10px; left: 20px; font-size: 30px;">🌙</div>
     <div style="position: absolute; top: 10px; right: 20px; font-size: 30px;">⭐️</div>
     
-    <div id="container" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); display: flex; flex-direction: column; align-items: center; gap: 30px;">
-        <p id="statusText" style="color: white; font-size: 20px; text-align: center;">Boshqa yo'lingiz yo'q, baribir rozi bo'lasiz! 😉</p>
-        <div style="display: flex; gap: 20px; align-items: center; position: relative; height: 100px; width: 300px; justify-content: center;">
-            <button id="yesBtn" onclick="celebrate()" style="padding: 15px 30px; font-size: 20px; background-color: #FFD700; color: #0b1126; border: none; border-radius: 15px; cursor: pointer; transition: 0.2s; z-index: 500; font-weight: bold;">ALBATTA! 🥙</button>
-            <button id="noBtn" style="padding: 10px 20px; font-size: 16px; background-color: #f44336; color: white; border: none; border-radius: 10px; position: absolute; transition: 0.15s ease-out; z-index: 1000; touch-action: none;">Yo'q ❌</button>
-        </div>
+    <div id="container" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center; width: 100%;">
+        <p id="msg" style="color: white; font-size: 18px; margin-bottom: 20px; font-family: sans-serif; transition: 0.3s;">Boshqa yo'lingiz yo'q! 😉</p>
+        <button id="yesBtn" onclick="celebrate()" style="padding: 15px 40px; font-size: 22px; background-color: #FFD700; color: #0b1126; border: none; border-radius: 15px; cursor: pointer; font-weight: bold; transition: 0.2s;">ALBATTA! 🥙</button>
     </div>
+
+    <button id="noBtn" style="padding: 10px 20px; font-size: 16px; background-color: #f44336; color: white; border: none; border-radius: 10px; position: absolute; left: 50%; top: 75%; transition: 0.1s; z-index: 1000; touch-action: none;">Yo'q ❌</button>
 </div>
 
 <script>
     const noBtn = document.getElementById('noBtn');
     const yesBtn = document.getElementById('yesBtn');
     const wrapper = document.getElementById('wrapper');
-    const statusText = document.getElementById('statusText');
+    const msg = document.getElementById('msg');
     
     let yesScale = 1;
-    let clickCount = 0;
+    let noScale = 1;
+    const phrases = [
+        "Sizga baribir qiyin!", 
+        "Tugma kichrayib ketyaptimi? 😂", 
+        "Baribir topolmaysiz!", 
+        "Ha ni bosaqoling, qiynalmay!", 
+        "Deyarli g'oyib bo'lyapman..."
+    ];
 
-    function moveButton() {
+    function escape() {
         // Wrapper o'lchamlari
-        const wWidth = wrapper.clientWidth;
-        const wHeight = wrapper.clientHeight;
+        const maxX = wrapper.clientWidth - noBtn.clientWidth - 30;
+        const maxY = wrapper.clientHeight - noBtn.clientHeight - 30;
+
+        // Random koordinata (faqat wrapper ichida)
+        const x = Math.max(15, Math.random() * maxX);
+        const y = Math.max(15, Math.random() * maxY);
+
+        noBtn.style.left = x + 'px';
+        noBtn.style.top = y + 'px';
+
+        // Mantiq: Ha kattalashadi, Yo'q kichrayadi
+        yesScale += 0.2;
+        noScale -= 0.1;
         
-        // Tugma o'lchamlari
-        const btnWidth = noBtn.clientWidth;
-        const btnHeight = noBtn.clientHeight;
+        // Agar Yo'q tugmasi juda kichrayib ketsa, minimal chegarada saqlaymiz
+        if (noScale < 0.2) noScale = 0.2;
 
-        // Chegaradan chiqib ketmasligi uchun random koordinata
-        const newX = Math.random() * (wWidth - btnWidth);
-        const newY = Math.random() * (wHeight - btnHeight);
-
-        noBtn.style.position = 'absolute';
-        noBtn.style.left = newX + 'px';
-        noBtn.style.top = newY + 'px';
-        noBtn.style.transform = 'none';
-
-        // "Ha" tugmasini kattalashtirish (majburlash effekti)
-        clickCount++;
-        yesScale += 0.15;
         yesBtn.style.transform = `scale(${yesScale})`;
+        noBtn.style.transform = `scale(${noScale})`;
         
-        if(clickCount > 5) {
-            statusText.innerText = "Qochib qutulolmaysiz! Qorin och qoldi... 🍗";
-            statusText.style.color = "#FFD700";
-        }
+        // Tasodifiy gaplar
+        msg.innerText = phrases[Math.floor(Math.random() * phrases.length)];
+        msg.style.color = "#FFD700";
     }
 
-    noBtn.addEventListener('mouseover', moveButton);
-    noBtn.addEventListener('touchstart', (e) => {
-        e.preventDefault();
-        moveButton();
-    });
+    noBtn.addEventListener('mouseover', escape);
+    noBtn.addEventListener('touchstart', (e) => { e.preventDefault(); escape(); });
 
     function celebrate() {
-        // Iftorlik konfetisi
-        var duration = 3 * 1000;
-        var end = Date.now() + duration;
-
-        (function frame() {
-          confetti({
-            particleCount: 5,
-            angle: 60,
-            spread: 55,
-            origin: { x: 0 },
-            colors: ['#FFD700', '#ffffff']
-          });
-          confetti({
-            particleCount: 5,
-            angle: 120,
-            spread: 55,
-            origin: { x: 1 },
-            colors: ['#FFD700', '#ffffff']
-          });
-
-          if (Date.now() < end) {
-            requestAnimationFrame(frame);
-          }
-        }());
-
-        setTimeout(() => {
-            alert('Allo xohlasa! Iftorlikda ko\\'rishamiz! 🥘☕️');
-        }, 500);
+        confetti({ particleCount: 250, spread: 120, origin: { y: 0.6 } });
+        alert('G\'alaba! 🏆 Iftorlik restoranda bo\'ladigan bo\'ldi! 🥘✨');
     }
 </script>
 """
