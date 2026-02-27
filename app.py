@@ -3,7 +3,7 @@ import streamlit.components.v1 as components
 
 st.set_page_config(page_title="Mantiqiy Savol", page_icon="🤔")
 
-st.markdown("<h1 style='text-align: center;'>Meni kechirasanmi? 🥺</h1>", unsafe_allow_html=True)
+st.markdown("<h1 style='text-align: center;'>Bugun iftorga restoranga boramizmi? 🥺</h1>", unsafe_allow_html=True)
 
 # Universal (PC + Mobile) kod
 html_code = """
